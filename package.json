@@ -4,7 +4,6 @@
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
-    "lint": "turbo lint",
     "format": "pnpm ultracite lint",
     "prepare": "husky",
     "commitlint": "commitlint --edit",
@@ -13,11 +12,11 @@
     "changeset": "changeset"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.27.1",
     "@biomejs/biome": "1.9.4",
+    "@changesets/cli": "^2.27.1",
     "@commitlint/cli": "^19.5.0",
     "@commitlint/config-conventional": "^19.5.0",
-    "husky": "^9.1.6",
+    "lefthook": "^1.10.10",
     "turbo": "^2.3.1",
     "typescript": "^5.7.3",
     "ultracite": "4.1.17"
