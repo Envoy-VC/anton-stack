@@ -1,5 +1,5 @@
 {
-  "name": "turbo-starter",
+  "name": "anton-stack",
   "private": true,
   "scripts": {
     "build": "turbo build",
