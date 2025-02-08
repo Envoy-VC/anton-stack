@@ -5,7 +5,6 @@
     "build": "turbo build",
     "dev": "turbo dev",
     "format": "pnpm ultracite lint",
-    "prepare": "husky",
     "commitlint": "commitlint --edit",
     "release": "pnpm turbo build --filter=@anton-stack/* && changeset publish",
     "version-packages": "changeset version",
