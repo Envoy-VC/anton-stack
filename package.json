@@ -7,9 +7,13 @@
     "lint": "turbo lint",
     "format": "npx ultracite lint",
     "prepare": "husky",
-    "commitlint": "commitlint --edit"
+    "commitlint": "commitlint --edit",
+    "release": "pnpm turbo build --filter=@anton-stack/* && changeset publish",
+    "version-packages": "changeset version",
+    "changeset": "changeset"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.27.1",
     "@biomejs/biome": "1.9.4",
     "@commitlint/cli": "^19.5.0",
     "@commitlint/config-conventional": "^19.5.0",
