@@ -8,12 +8,17 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    },
+    "./cdp": {
+      "types": "./dist/cdp/index.d.ts",
+      "import": "./dist/cdp/index.mjs",
+      "require": "./dist/cdp/index.js"
     }
   },
   "main": "./dist/index.js",
-  "module": "./dist/index.js",
+  "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "files": ["dist/**"],
   "scripts": {
