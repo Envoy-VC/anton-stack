@@ -12,7 +12,7 @@ import {
   GetBalancesParameters,
 } from '~/common';
 
-export class OneInchActionProvider extends ActionProvider<EvmWalletProvider> {
+class OneInchActionProvider extends ActionProvider<EvmWalletProvider> {
   private readonly baseUrl: string;
   private readonly apiKey?: string;
 
@@ -56,3 +56,6 @@ export class OneInchActionProvider extends ActionProvider<EvmWalletProvider> {
     return network.protocolFamily === 'evm';
   }
 }
+
+export const oneInchActionProvider = (params: BalanceServiceParams) =>
+  new OneInchActionProvider(params);

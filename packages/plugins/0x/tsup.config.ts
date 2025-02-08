@@ -16,8 +16,8 @@ export default defineConfig([
     ...commonConfig,
   },
   {
-    entry: ['./src/cdp/index.ts'],
-    outDir: 'dist/cdp',
+    entry: ['./src/agentkit/index.ts'],
+    outDir: 'dist/agentkit',
     ...commonConfig,
   },
 ]);

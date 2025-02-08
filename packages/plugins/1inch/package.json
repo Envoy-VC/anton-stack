@@ -11,10 +11,10 @@
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
     },
-    "./cdp": {
-      "types": "./dist/cdp/index.d.ts",
-      "import": "./dist/cdp/index.mjs",
-      "require": "./dist/cdp/index.js"
+    "./agentkit": {
+      "types": "./dist/agentkit/index.d.ts",
+      "import": "./dist/agentkit/index.mjs",
+      "require": "./dist/agentkit/index.js"
     }
   },
   "main": "./dist/index.js",

@@ -12,7 +12,7 @@ import {
   supportedChains,
 } from '~/common';
 
-export class ZeroXActionProvider extends ActionProvider<EvmWalletProvider> {
+class ZeroXActionProvider extends ActionProvider<EvmWalletProvider> {
   private readonly apiKey: string;
 
   constructor({ apiKey }: { apiKey: string }) {
@@ -108,3 +108,6 @@ export class ZeroXActionProvider extends ActionProvider<EvmWalletProvider> {
     return supportedChains.includes(network.chainId);
   }
 }
+
+export const zeroXActionProvider = (params: { apiKey: string }) =>
+  new ZeroXActionProvider(params);
