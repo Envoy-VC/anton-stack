@@ -1,0 +1,46 @@
+{
+  "name": "@anton-stack/uniswap-plugin",
+  "version": "0.0.0",
+  "description": "",
+  "keywords": [],
+  "license": "ISC",
+  "author": "",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    },
+    "./agentkit": {
+      "types": "./dist/agentkit/index.d.ts",
+      "import": "./dist/agentkit/index.mjs",
+      "require": "./dist/agentkit/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist/**"
+  ],
+  "scripts": {
+    "build": "rm -rf ./dist && tsup",
+    "dev": "vitest",
+    "format": "pnpm format:write",
+    "format:check": "pnpm ultracite lint",
+    "format:write": "pnpm ultracite format",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@envoy1084/style-guide": "^0.1.0",
+    "@types/node": "^22",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.4"
+  },
+  "dependencies": {
+    "@coinbase/agentkit": "^0.1.2",
+    "viem": "^2.22.23",
+    "zod": "^3.24.1"
+  }
+}
