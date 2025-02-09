@@ -6,6 +6,9 @@
   },
   "linter": {
     "rules": {
+      "nursery": {
+        "noEnum": "off"
+      },
       "suspicious": {
         "noConsole": "off",
         "noConsoleLog": "off"
