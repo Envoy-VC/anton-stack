@@ -20,7 +20,9 @@
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
-  "files": ["dist/**"],
+  "files": [
+    "dist/**"
+  ],
   "scripts": {
     "build": "rm -rf ./dist && tsup",
     "dev": "vitest",
@@ -38,6 +40,7 @@
   },
   "dependencies": {
     "@coinbase/agentkit": "^0.1.2",
+    "viem": "^2.22.23",
     "zod": "^3.24.1"
   }
 }
