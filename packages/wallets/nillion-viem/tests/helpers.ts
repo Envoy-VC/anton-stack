@@ -18,6 +18,21 @@ export const Env = {
   programNamespace: process.env.NILLION_TEST_PROGRAMS_NAMESPACE ?? '',
 };
 
+export type Suite =
+  | 'Client'
+  | 'Store'
+  | 'Sign'
+  | 'SignMessage'
+  | 'SignRawMessage'
+  | 'SignTypedData'
+  | 'SignTransaction';
+
 export const PrivateKeyPerSuite = {
-  Transactions: Env.nilChainPrivateKey0,
+  Client: Env.nilChainPrivateKey0,
+  Store: Env.nilChainPrivateKey1,
+  Sign: Env.nilChainPrivateKey2,
+  SignMessage: Env.nilChainPrivateKey3,
+  SignRawMessage: Env.nilChainPrivateKey4,
+  SignTypedData: Env.nilChainPrivateKey5,
+  SignTransaction: Env.nilChainPrivateKey6,
 };
