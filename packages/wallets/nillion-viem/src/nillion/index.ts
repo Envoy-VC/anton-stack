@@ -26,7 +26,7 @@ import {
 import type { SignReturnType, SignTransactionParameters } from 'viem/accounts';
 import { createNillionClient } from './client';
 import { sign } from './sign';
-import { storePrivateKey, storedDigestMessage } from './store';
+import { storePrivateKey } from './store';
 
 type SignTransactionReturnType<
   serializer extends
@@ -63,25 +63,8 @@ export class NillionECDSA {
 
   async storePrivateKey(props: StorePrivateKeyProps): Promise<Uuid> {
     const client = await this.initialize();
-    return await storePrivateKey({ client, ...props });
-  }
-
-  async signMessage({
-    message,
-    privateKeyStoreId,
-  }: SignMessageProps): Promise<Hex> {
-    const client = await this.initialize();
-    const hashedMessage = hashMessage(message, 'bytes');
-    const digestMessageStoreId = await storedDigestMessage({
-      client,
-      message: hashedMessage,
-    });
-    return await sign({
-      client,
-      digestMessageStoreId,
-      privateKeyStoreId,
-      to: 'hex',
-    });
+    const uuid = await storePrivateKey({ client, ...props });
+    return uuid;
   }
 
   async sign<to extends To = 'object'>({
@@ -91,16 +74,29 @@ export class NillionECDSA {
   }: SignProps<to>): Promise<SignReturnType<to>> {
     const client = await this.initialize();
     const byteMessage = hexToBytes(message);
-    const digestMessageStoreId = await storedDigestMessage({
+
+    const signature = await sign({
       client,
-      message: byteMessage,
-    });
-    return await sign({
-      client,
-      digestMessageStoreId,
+      digestMessage: byteMessage,
       privateKeyStoreId,
       to,
     });
+    return signature;
+  }
+
+  async signMessage({
+    message,
+    privateKeyStoreId,
+  }: SignMessageProps): Promise<Hex> {
+    const client = await this.initialize();
+    const hashedMessage = hashMessage(message, 'bytes');
+    const signature = await sign({
+      client,
+      digestMessage: hashedMessage,
+      privateKeyStoreId,
+      to: 'hex',
+    });
+    return signature;
   }
 
   async signTransaction<
@@ -117,8 +113,6 @@ export class NillionECDSA {
       transaction: _transaction,
       serializer: _serializer = serializeTransaction,
     } = parameters;
-
-    parameters.transaction;
 
     const signableTransaction = (() => {
       // For EIP-4844 Transactions, we want to sign the transaction payload body (tx_payload_body) without the sidecars (ie. without the network wrapper).
@@ -154,13 +148,13 @@ export class NillionECDSA {
       to?: to | To | undefined;
     }>
   ): Promise<SignReturnType<to>> {
-    const { privateKeyStoreId, data } = parameters;
-
-    return await this.sign({
+    const { data, privateKeyStoreId, to: _to } = parameters;
+    const signature = await this.sign({
       message: hashTypedData(data),
-      privateKeyStoreId,
-      to: parameters.to,
+      privateKeyStoreId: privateKeyStoreId,
+      to: _to,
     });
+    return signature;
   }
 }
 

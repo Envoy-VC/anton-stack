@@ -5,8 +5,7 @@ import type { NillionAccountProps } from '~/types';
 export const nillionAccount = (_props: NillionAccountProps): LocalAccount => {
   const { address, privateKeyStoreId, ...props } = _props;
   const ecdsa = new NillionECDSA(props);
-  return toAccount({
-    source: 'nillion',
+  const account = toAccount({
     address: address,
     async signMessage({ message }) {
       return await ecdsa.signMessage({ message, privateKeyStoreId });
@@ -26,4 +25,10 @@ export const nillionAccount = (_props: NillionAccountProps): LocalAccount => {
       });
     },
   });
+
+  return {
+    ...account,
+    source: 'nillion',
+    type: 'local',
+  };
 };

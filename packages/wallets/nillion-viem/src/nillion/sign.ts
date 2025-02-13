@@ -2,23 +2,30 @@ import type { EcdsaSignature } from '@nillion/client-wasm';
 import { Constants } from './constants';
 
 import type { Uuid, VmClient } from '@nillion/client-vms';
-import { compactSignatureToSignature, serializeSignature, toHex } from 'viem';
+import { secp256k1 } from '@noble/curves/secp256k1';
+import { bytesToBigInt, serializeSignature } from 'viem';
 import type { SignReturnType } from 'viem/accounts';
 import type { To } from '~/types';
+import { buildCompleteSignature } from './helpers';
+import { storedDigestMessage } from './store';
 
 type SignProps<to extends To = 'object'> = {
   client: VmClient;
   privateKeyStoreId: Uuid;
-  digestMessageStoreId: Uuid;
+  digestMessage: Uint8Array;
   to?: to | To | undefined;
 };
 
 export const sign = async <to extends To = 'object'>({
   client,
   privateKeyStoreId,
-  digestMessageStoreId,
+  digestMessage,
   to = 'object',
 }: SignProps<to>): Promise<SignReturnType<to>> => {
+  const digestMessageStoreId = await storedDigestMessage({
+    client,
+    message: digestMessage,
+  });
   const computeResultId = await client
     .invokeCompute()
     .program(Constants.tecdsaProgramId)
@@ -38,10 +45,12 @@ export const sign = async <to extends To = 'object'>({
   const res = computeResult[Constants.tecdsaSignatureName]
     ?.value as EcdsaSignature;
 
-  const signature = compactSignatureToSignature({
-    r: toHex(res.r()),
-    yParityAndS: toHex(res.s()),
-  });
+  const sig = new secp256k1.Signature(
+    bytesToBigInt(res.r()),
+    bytesToBigInt(res.s())
+  );
+
+  const signature = buildCompleteSignature(sig, digestMessage);
 
   return (() => {
     if (to === 'bytes' || to === 'hex') {
