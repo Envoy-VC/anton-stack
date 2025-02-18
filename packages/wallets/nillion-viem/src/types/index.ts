@@ -1,6 +1,7 @@
 import type { OfflineSigner } from '@cosmjs/proto-signing';
 import type { ProgramId, UserId, Uuid, VmClient } from '@nillion/client-vms';
 import type { Hash, Hex, SignableMessage } from 'viem';
+import type { NillionECDSA } from '..';
 
 export interface CreateClientProps {
   seed: string;
@@ -12,6 +13,11 @@ export interface CreateClientProps {
 export type To = 'object' | 'bytes' | 'hex';
 
 export interface NillionECDSAProps extends CreateClientProps {}
+
+export type WithKeys<T> = T & {
+  publicKey: Hex;
+  privateKeyStoreId: Uuid;
+};
 
 export interface PermissionsProps {
   owner?: UserId;
@@ -34,23 +40,18 @@ export interface StorePrivateKeyProps {
   ttl?: number;
   permissions?: BuildPermissionProps['permissions'];
 }
-export interface SignProps<to extends To = 'object'> {
-  privateKeyStoreId: Uuid;
+
+export type SignProps<to extends To = 'object'> = WithKeys<{
   message: Hash;
   to: to | To | undefined;
-}
+}>;
 
-export interface SignMessageProps {
-  privateKeyStoreId: Uuid;
+export type SignMessageProps = WithKeys<{
   message: SignableMessage;
-}
-
-export type WithPrivateKeyStoreId<T> = T & {
-  privateKeyStoreId: Uuid;
-};
+}>;
 
 /** Nillion Account */
-export interface NillionAccountProps extends CreateClientProps {
+export type NillionAccountProps = WithKeys<{
+  ecdsaClient: NillionECDSA;
   address: Hex;
-  privateKeyStoreId: Uuid;
-}
+}>;

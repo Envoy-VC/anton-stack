@@ -6,7 +6,7 @@ import type {
   SignProps,
   StorePrivateKeyProps,
   To,
-  WithPrivateKeyStoreId,
+  WithKeys,
 } from '~/types';
 
 import {
@@ -66,6 +66,7 @@ export class NillionECDSA {
   async sign<to extends To = 'object'>({
     message,
     privateKeyStoreId,
+    publicKey,
     to = 'object',
   }: SignProps<to>): Promise<SignReturnType<to>> {
     const client = await this.initialize();
@@ -74,6 +75,7 @@ export class NillionECDSA {
     const signature = await sign({
       client,
       digestMessage: byteMessage,
+      publicKey,
       privateKeyStoreId,
       to,
     });
@@ -83,12 +85,14 @@ export class NillionECDSA {
   async signMessage({
     message,
     privateKeyStoreId,
+    publicKey,
   }: SignMessageProps): Promise<Hex> {
     const client = await this.initialize();
     const hashedMessage = hashMessage(message, 'bytes');
     const signature = await sign({
       client,
       digestMessage: hashedMessage,
+      publicKey,
       privateKeyStoreId,
       to: 'hex',
     });
@@ -100,7 +104,7 @@ export class NillionECDSA {
       SerializeTransactionFn<TransactionSerializable> = SerializeTransactionFn<TransactionSerializable>,
     transaction extends Parameters<serializer>[0] = Parameters<serializer>[0],
   >(
-    parameters: WithPrivateKeyStoreId<
+    parameters: WithKeys<
       Omit<SignTransactionParameters<serializer, transaction>, 'privateKey'>
     >
   ) {
@@ -108,6 +112,7 @@ export class NillionECDSA {
       privateKeyStoreId,
       transaction: _transaction,
       serializer: _serializer = serializeTransaction,
+      publicKey,
     } = parameters;
 
     const signableTransaction = (() => {
@@ -125,6 +130,7 @@ export class NillionECDSA {
     const signature = await this.sign({
       message: keccak256(_serializer(signableTransaction)),
       privateKeyStoreId,
+      publicKey,
       to: 'object',
     });
 
@@ -139,15 +145,16 @@ export class NillionECDSA {
     primaryType extends keyof typedData | 'EIP712Domain',
     to extends To = 'object',
   >(
-    parameters: WithPrivateKeyStoreId<{
+    parameters: WithKeys<{
       data: TypedDataDefinition<typedData, primaryType>;
       to?: to | To | undefined;
     }>
   ): Promise<SignReturnType<to>> {
-    const { data, privateKeyStoreId, to: _to } = parameters;
+    const { data, privateKeyStoreId, to: _to, publicKey } = parameters;
     const signature = await this.sign({
       message: hashTypedData(data),
       privateKeyStoreId: privateKeyStoreId,
+      publicKey,
       to: _to,
     });
     return signature;
