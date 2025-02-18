@@ -6,9 +6,9 @@ export default defineConfig(({ mode }) => ({
   plugins: [tsconfigPaths(), wasm()],
   test: {
     testTimeout: 0,
-    retry: 10,
     env: loadEnv(mode, process.cwd(), ''),
     coverage: {
+      enabled: true,
       reporter: ['text', 'json-summary', 'json'],
       provider: 'v8',
     },

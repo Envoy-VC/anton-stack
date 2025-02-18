@@ -1,39 +1,16 @@
-import { createSignerFromKey } from '@nillion/client-vms';
-import { secp256k1 } from '@noble/curves/secp256k1';
-import { type LocalAccount, recoverTypedDataAddress, toHex } from 'viem';
-import { privateKeyToAccount } from 'viem/accounts';
-import { assert, beforeAll, describe, it } from 'vitest';
-import { NillionECDSA, nillionAccount as nilAccount } from '../src';
-import { Env, PrivateKeyPerSuite } from './helpers';
+import { recoverTypedDataAddress } from 'viem';
+import { beforeAll, describe, expect, it } from 'vitest';
+import { type Context, prepareEnv } from './prepare-env';
 
 describe('Sign Typed Data', () => {
-  const privateKey = secp256k1.utils.randomPrivateKey();
-  const address = privateKeyToAccount(toHex(privateKey)).address;
-
-  let client: NillionECDSA;
-  let nillionAccount: LocalAccount;
-  const seed = crypto.randomUUID();
+  let context: Context;
 
   beforeAll(async () => {
-    const signer = await createSignerFromKey(PrivateKeyPerSuite.SignTypedData);
-    client = new NillionECDSA({
-      seed,
-      signer,
-      chainUrl: Env.nilChainUrl,
-      bootnodeUrl: Env.bootnodeUrl,
-    });
-    const storeId = await client.storePrivateKey({ privateKey });
-    nillionAccount = nilAccount({
-      seed,
-      signer,
-      address,
-      chainUrl: Env.nilChainUrl,
-      privateKeyStoreId: storeId,
-      bootnodeUrl: Env.bootnodeUrl,
-    });
+    context = await prepareEnv('SignTypedData');
   });
 
   it('should sign a simple typed data', async () => {
+    const { nillionAccount, address } = context;
     const domain = {
       name: 'Ether Mail',
       version: '1',
@@ -76,6 +53,6 @@ describe('Sign Typed Data', () => {
       signature,
     });
 
-    assert.equal(recovered, address);
+    expect(recovered).equals(address);
   });
 });

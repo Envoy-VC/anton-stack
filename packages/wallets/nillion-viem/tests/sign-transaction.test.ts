@@ -1,65 +1,33 @@
-import { createSignerFromKey } from '@nillion/client-vms';
-import { secp256k1 } from '@noble/curves/secp256k1';
-import {
-  type LocalAccount,
-  type TransactionSerializableLegacy,
-  parseGwei,
-  parseTransaction,
-  recoverTransactionAddress,
-  serializeTransaction,
-  toHex,
-} from 'viem';
-import { privateKeyToAccount } from 'viem/accounts';
-import { assert, beforeAll, describe, it } from 'vitest';
-import { NillionECDSA, nillionAccount as nilAccount } from '../src';
-import { Env, PrivateKeyPerSuite } from './helpers';
+import { parseGwei, recoverTransactionAddress } from 'viem';
+import { beforeAll, describe, expect, it } from 'vitest';
+import {} from './helpers';
+import { type Context, prepareEnv } from './prepare-env';
 
 describe('Sign Transaction', () => {
-  const privateKey = secp256k1.utils.randomPrivateKey();
-  const address = privateKeyToAccount(toHex(privateKey)).address;
-
-  let client: NillionECDSA;
-  let nillionAccount: LocalAccount;
-  const seed = crypto.randomUUID();
+  let context: Context;
 
   beforeAll(async () => {
-    const signer = await createSignerFromKey(
-      PrivateKeyPerSuite.SignTransaction
-    );
-    client = new NillionECDSA({
-      seed,
-      signer,
-      chainUrl: Env.nilChainUrl,
-      bootnodeUrl: Env.bootnodeUrl,
-    });
-    const storeId = await client.storePrivateKey({ privateKey });
-    nillionAccount = nilAccount({
-      seed,
-      signer,
-      address,
-      chainUrl: Env.nilChainUrl,
-      privateKeyStoreId: storeId,
-      bootnodeUrl: Env.bootnodeUrl,
-    });
+    context = await prepareEnv('SignTransaction');
   });
 
   it('should sign transaction', async () => {
-    const tx: TransactionSerializableLegacy = {
-      to: '0x70997970c51812dc3a010c7d01b50e0d17dc79c8',
-      value: BigInt('1000000000000000000'),
-      chainId: 1,
-      type: 'legacy',
-      gasPrice: parseGwei('10'),
-    };
-    const serialized = serializeTransaction(tx);
-    const parsed = parseTransaction(serialized);
+    const { nillionAccount, address } = context;
 
-    const sig = await nillionAccount.signTransaction(parsed);
+    const sig = await nillionAccount.signTransaction({
+      chainId: 1,
+      maxFeePerGas: parseGwei('20'),
+      maxPriorityFeePerGas: parseGwei('3'),
+      gas: 21000n,
+      nonce: 69,
+      to: '0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266',
+      value: parseGwei('1'),
+      data: '0x01',
+    });
 
     const recovered = await recoverTransactionAddress({
       serializedTransaction: sig,
     });
 
-    assert.equal(recovered, address);
+    expect(recovered).equals(address);
   });
 });
