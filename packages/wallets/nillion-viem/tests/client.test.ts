@@ -14,10 +14,10 @@ describe('Nillion ECDSA Client', () => {
 
   it('should create a new client', () => {
     const client = new NillionECDSA({
+      signer,
       seed: Env.seed,
       chainUrl: Env.nilChainUrl,
       bootnodeUrl: Env.bootnodeUrl,
-      signer,
     });
 
     expect(client).to.exist;

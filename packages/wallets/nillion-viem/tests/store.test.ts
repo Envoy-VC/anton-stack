@@ -1,23 +1,26 @@
-import { beforeEach, describe, expect, it } from 'vitest';
-import type { NillionECDSA } from '../src/nillion';
-import { createClient } from './setup';
-
-import type { OfflineSigner } from '@cosmjs/proto-signing';
+import { createSignerFromKey } from '@nillion/client-vms';
 import { secp256k1 } from '@noble/curves/secp256k1';
+import { beforeAll, describe, expect, it } from 'vitest';
+import { NillionECDSA } from '../src/nillion';
+import { Env, PrivateKeyPerSuite } from './helpers';
 
 describe('Store Private Key', () => {
-  let client: {
-    client: NillionECDSA;
-    signer: OfflineSigner;
-  };
+  let client: NillionECDSA;
+  const seed = crypto.randomUUID();
 
-  beforeEach(async () => {
-    client = await createClient('Store');
+  beforeAll(async () => {
+    const signer = await createSignerFromKey(PrivateKeyPerSuite.Store);
+    client = new NillionECDSA({
+      seed,
+      signer,
+      chainUrl: Env.nilChainUrl,
+      bootnodeUrl: Env.bootnodeUrl,
+    });
   });
 
   it('should store private key', async () => {
     const privateKey = secp256k1.utils.randomPrivateKey();
-    const storeId = await client.client.storePrivateKey({ privateKey });
+    const storeId = await client.storePrivateKey({ privateKey });
 
     expect(storeId).toHaveLength(36);
   });

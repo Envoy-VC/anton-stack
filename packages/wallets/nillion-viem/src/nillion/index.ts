@@ -1,5 +1,5 @@
 import type { OfflineSigner } from '@cosmjs/proto-signing';
-import type { Uuid, VmClient } from '@nillion/client-vms';
+import type { Uuid } from '@nillion/client-vms';
 import type {
   NillionECDSAProps,
   SignMessageProps,
@@ -39,26 +39,22 @@ export class NillionECDSA {
   private signer: OfflineSigner;
   private chainUrl: string;
   private bootnodeUrl: string;
-  client: VmClient | null;
 
   constructor(props: NillionECDSAProps) {
     this.seed = props.seed;
     this.signer = props.signer;
     this.chainUrl = props.chainUrl;
     this.bootnodeUrl = props.bootnodeUrl;
-    this.client = null;
   }
 
   async initialize() {
-    if (!this.client) {
-      this.client = await createNillionClient({
-        seed: this.seed,
-        signer: this.signer,
-        chainUrl: this.chainUrl,
-        bootnodeUrl: this.bootnodeUrl,
-      });
-    }
-    return this.client;
+    const client = await createNillionClient({
+      seed: this.seed,
+      signer: this.signer,
+      chainUrl: this.chainUrl,
+      bootnodeUrl: this.bootnodeUrl,
+    });
+    return client;
   }
 
   async storePrivateKey(props: StorePrivateKeyProps): Promise<Uuid> {

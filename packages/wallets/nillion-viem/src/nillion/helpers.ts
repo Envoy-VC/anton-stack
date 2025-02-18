@@ -14,9 +14,12 @@ export const buildPermissions = ({
   } else {
     _permissions = {};
   }
-  const perms = ValuesPermissionsBuilder.init().owner(
-    _permissions.owner ?? client.config.id
-  );
+
+  const perms = ValuesPermissionsBuilder.defaultOwner(
+    _permissions.owner ?? client.id
+  )
+    // Add TECDSA Perms
+    .grantCompute(client.id, Constants.tecdsaProgramId);
 
   for (const user of _permissions.retrieve ?? []) {
     perms.grantRetrieve(user);
@@ -30,9 +33,6 @@ export const buildPermissions = ({
   for (const { user, programId } of _permissions.compute ?? []) {
     perms.grantCompute(user, programId);
   }
-
-  // Add TECDSA Perms
-  perms.grantCompute(client.id, Constants.tecdsaProgramId);
 
   return perms.build();
 };
@@ -56,7 +56,7 @@ export const buildCompleteSignature = (
         break;
       }
     } catch {
-      // Go to next recovery
+      updated = signature;
     }
   }
 
@@ -65,12 +65,10 @@ export const buildCompleteSignature = (
   }
 
   const yParity = updated.recovery === 1 ? 1 : 0;
-  const v = yParity === 1 ? 28n : 27n;
   const sig: Signature = {
     r: numberToHex(updated.r),
     s: numberToHex(updated.s),
     yParity,
-    v,
   };
   return sig;
 };

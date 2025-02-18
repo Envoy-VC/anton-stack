@@ -3,10 +3,9 @@ import { Constants } from './constants';
 
 import type { Uuid, VmClient } from '@nillion/client-vms';
 import { secp256k1 } from '@noble/curves/secp256k1';
-import { bytesToBigInt, serializeSignature } from 'viem';
+import { type Signature, bytesToBigInt, serializeSignature, toHex } from 'viem';
 import type { SignReturnType } from 'viem/accounts';
 import type { To } from '~/types';
-import { buildCompleteSignature } from './helpers';
 import { storedDigestMessage } from './store';
 
 type SignProps<to extends To = 'object'> = {
@@ -50,7 +49,14 @@ export const sign = async <to extends To = 'object'>({
     bytesToBigInt(res.s())
   );
 
-  const signature = buildCompleteSignature(sig, digestMessage);
+  const recovery = sig.recovery ? 1 : 0;
+  const updated = sig.addRecoveryBit(recovery);
+
+  const signature: Signature = {
+    r: toHex(updated.r),
+    s: toHex(updated.s),
+    v: updated.recovery ? 28n : 27n,
+  };
 
   return (() => {
     if (to === 'bytes' || to === 'hex') {

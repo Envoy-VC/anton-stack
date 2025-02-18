@@ -22,17 +22,12 @@ export const storePrivateKey = async (
 
   const builder = client
     .storeValues()
+    .permissions(permissions)
     .ttl(ttl ?? 1)
-    .value(
-      Constants.tecdsaKeyName,
-      NadaValue.new_ecdsa_private_key(privateKey)
-    );
+    .value(Constants.tecdsaKeyName, NadaValue.new_ecdsa_private_key(privateKey))
+    .build();
 
-  if (permissions) {
-    builder.permissions(permissions);
-  }
-
-  const storeId = await builder.build().invoke();
+  const storeId = await builder.invoke();
 
   return storeId;
 };
@@ -59,13 +54,11 @@ export const storedDigestMessage = async (
     .value(
       Constants.tecdsaDigestName,
       NadaValue.new_ecdsa_digest_message(message)
-    );
+    )
+    .permissions(permissions)
+    .build();
 
-  if (permissions) {
-    builder.permissions(permissions);
-  }
-
-  const storeId = await builder.build().invoke();
+  const storeId = await builder.invoke();
 
   return storeId;
 };
